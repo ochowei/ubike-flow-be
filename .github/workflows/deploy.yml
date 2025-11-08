@@ -31,5 +31,5 @@ jobs:
 
       # 5. 部署 Edge Functions
       - name: Deploy Supabase Functions
-        run: supabase functions deploy --no-verify-jwt
+        run: supabase functions deploy
         
