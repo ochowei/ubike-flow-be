@@ -36,25 +36,6 @@ serve(async (req) => {
     return new Response("ok", { headers: { "Access-Control-Allow-Origin": "*" } });
   }
 
-  // 2. 
-  // 這是最重要的安全檢查！
-  // 確保只有知道秘密金鑰的服務 (例如我們的 GitHub Action) 才能觸發此 Fucntion
-  try {
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Missing authorization header");
-    
-    const token = authHeader.replace("Bearer ", "");
-    if (token !== INGEST_SECRET_KEY) {
-      throw new Error("Invalid authorization token");
-    }
-  } catch (error) {
-    console.error(error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 401,
-      headers: { "Content-Type": "application/json" },
-    });
-  }
-
   // 3. 初始化 Supabase Admin Client
   // 我們使用 SERVICE_KEY，因為這個 Function 需要完整的資料庫寫入權限
   const supabaseAdmin = createClient(SUPABASE_URL!, SUPABASE_SERVICE_KEY!);
