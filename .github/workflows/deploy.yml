@@ -29,6 +29,7 @@ jobs:
         with:
           version: latest
 
-      # 5. 部署所有 Edge Functions
+      # 5. 部署 Edge Functions
       - name: Deploy Supabase Functions
-        run: supabase functions deploy
+        run: supabase functions deploy ingest-data --no-verify-jwt
+        
