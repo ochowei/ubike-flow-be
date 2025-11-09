@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2";
-import { IDatabaseRepository, StationPayload, StatusPayload, LogPayload } from "./database.interface.ts";
+import { IDatabaseRepository, StationPayload, StatusPayload, LogPayload } from "../../core/types/database.types.ts";
 
 export class SupabaseRepository implements IDatabaseRepository {
   private supabaseAdmin: SupabaseClient;
