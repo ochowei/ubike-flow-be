@@ -1,12 +1,11 @@
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { IDatabaseRepository } from "../_shared/database.interface.ts";
+import { SupabaseRepository } from "../_shared/supabase.repository.ts";
 
 // --- 常數設定 ---
-const YBIKE_API_URL = "https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json"
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")
-const SUPABASE_SERVICE_KEY = Deno.env.get("SUPABASE_ANON_KEY")
+const YBIKE_API_URL = "https://tcgbusfs.blob.core.windows.net/dotapp/youbike/v2/youbike_immediate.json";
 
-// --- TypeScript 類型 (根據您的 JSON) ---
+// --- TypeScript 類型 (來自 YouBike API) ---
 interface YouBikeStation {
   sno: string;
   sna: string;
@@ -41,12 +40,8 @@ serve(async (req) => {
     return new Response("ok", { headers: corsHeaders });
   }
 
-  // 2. 
-  // (已移除安全驗證)
-  // 
-
   const startTime = new Date();
-  const supabaseAdmin = createClient(SUPABASE_URL!, SUPABASE_SERVICE_KEY!);
+  const db: IDatabaseRepository = new SupabaseRepository();
 
   try {
     // 3. --- 抓取 YouBike API ---
@@ -56,7 +51,7 @@ serve(async (req) => {
     }
     const data: YouBikeStation[] = await response.json();
     const recordsFetched = data.length;
-    
+
     if (recordsFetched === 0) {
       throw new Error("YouBike API returned an empty array");
     }
@@ -84,21 +79,18 @@ serve(async (req) => {
       src_update_time: s.srcUpdateTime,
       api_update_time: s.updateTime,
     }));
-    
+
     const apiBatchTime = statusInsertPayload[0]?.src_update_time || null;
 
     // 5. --- 寫入資料庫 (並行執行) ---
-    const [stationsResult, statusResult] = await Promise.all([
-      supabaseAdmin.from("stations").upsert(stationsUpsertPayload, { onConflict: 'sno' }),
-      supabaseAdmin.from("station_status").insert(statusInsertPayload)
+    await Promise.all([
+      db.upsertStations(stationsUpsertPayload),
+      db.insertStationStatus(statusInsertPayload),
     ]);
-
-    if (stationsResult.error) throw new Error(`Station upsert error: ${stationsResult.error.message}`);
-    if (statusResult.error) throw new Error(`Status insert error: ${statusResult.error.message}`);
 
     // 6. --- 寫入 Log (成功) ---
     const endTime = new Date();
-    await supabaseAdmin.from("batch_logs").insert({
+    await db.insertBatchLog({
       run_started_at: startTime.toISOString(),
       run_ended_at: endTime.toISOString(),
       status: "success",
@@ -117,12 +109,12 @@ serve(async (req) => {
   } catch (error) {
     // 8. --- 捕捉錯誤並更新 Log (失敗) ---
     const endTime = new Date();
-    await supabaseAdmin.from("batch_logs").insert({
+    await db.insertBatchLog({
       run_started_at: startTime.toISOString(),
       run_ended_at: endTime.toISOString(),
       status: "failure",
       duration_ms: endTime.getTime() - startTime.getTime(),
-      error_message: error.message
+      error_message: error.message,
     });
 
     return new Response(
