@@ -10,11 +10,15 @@
 
 所有與外部服務（特別是資料庫）的互動都必須透過抽象介面來進行：
 
-* **合約 (Interface):** 應在 `_shared/` 中定義一個 `*.interface.ts` 檔案，用來宣告該服務的方法（例如 `IDatabaseRepository`）。
+* **合約 (Interface):** 應在共用模組中定義一個 `*.interface.ts` 檔案，用來宣告該服務的方法（例如 `IDatabaseRepository`）。
 * **實作 (Implementation):** 特定平台的實作（例如 `_shared/supabase.repository.ts`）必須實作 (implements) 該介面。
 * **消費者 (Consumer):** 業務邏輯 (例如 Edge Functions) 只能依賴於「介面」，而不應知道「實作」的存在。
 
-## 3. 共用模組 (Shared Modules)
+## 3. Supabase 共用模組 (Shared Modules for Supabase)
 
-* 所有可在 Functions 之間共用的程式碼（例如 Repository、介面、型別定義）應放置在 `supabase/functions/_shared/` 目錄下。
+* `supabase/functions/_shared/` 目錄是用於存放**專門供 Supabase Edge Functions 共用的程式碼**。
+* 這包括：
+    * 平台特定的實作 (例如 `supabase.repository.ts`)。
+    * 在 Functions 之間共用的介面 (例如 `database.interface.ts`)。
+    * 共用的型別 (Types) 或工具 (Utilities)。
 * 以底線 `_` 開頭的目錄不會被 Supabase CLI 部署為獨立的 Edge Function，使其成為存放共用邏輯的理想位置。
