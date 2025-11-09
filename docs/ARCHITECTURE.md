@@ -35,3 +35,19 @@
 *   **合約 (Interface):** 介面定義於 `src/core/interfaces/` 目錄（例如 `database.interface.ts`）。
 *   **實作 (Implementation):** 特定平台的實作應存放在平台相關的目錄，例如 `supabase/functions/_shared/supabase.repository.ts`。此實作必須 `implements` `src/core/interfaces/` 中定義的介面。
 *   **消費者 (Consumer):** 業務邏輯 (Use Cases) 只能依賴於「介面」，而不應知道「實作」的存在。
+
+## 4. 測試原則 (Testing Principles)
+
+### 單元測試 (Unit Tests)
+
+所有在 `src/core/usecases/` 中的核心業務邏輯 (Use Cases) 必須有對應的單元測試。
+
+測試檔案應與被測試的檔案放在同一目錄下，並以 `.test.ts` 結尾 (例如 `ingest-data.usecase.test.ts`)。
+
+單元測試必須模擬 (Mock) 所有外部依賴（例如 `IDatabaseRepository`, `IYouBikeService`），僅專注於測試 Use Case 本身的邏輯。
+
+### 測試框架 (Testing Stack)
+
+*   **測試運行器 (Runner):** `Deno.test` (Deno 內建)
+*   **斷言 (Assertions):** `deno.land/std/assert` (Deno 標準庫)
+*   **模擬 (Mocks):** `deno.land/std/testing/mock.ts` (Deno 標準庫)
