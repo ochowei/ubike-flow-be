@@ -24,7 +24,7 @@ jobs:
           deno-version: v1.x
       - name: Run Deno tests
         # Ref: https://docs.deno.com/deploy/ci-cd/github-actions
-        run: deno test --allow-all --junit=test-results.xml
+        run: deno test --allow-all --junit-path test-results.xml
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
