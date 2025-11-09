@@ -1,0 +1,107 @@
+openapi: "3.0.3"
+info:
+  title: "ubike-flow-be API"
+  description: "用於處理 YouBike (ubike-flow) 資料的 Supabase Edge Functions。"
+  version: "1.0.0"
+
+# 伺服器 URL (Supabase Functions 的標準路徑)
+servers:
+  - url: "https://{projectId}.supabase.co/functions/v1"
+    variables:
+      projectId:
+        default: "YOUR_PROJECT_ID" # 請替換為您的 Supabase 專案 ID
+        description: "您的 Supabase 專案 ID。"
+
+# API 標籤 (用於分組)
+tags:
+  - name: "General"
+    description: "一般功能與測試"
+  - name: "Data"
+    description: "資料擷取與處理"
+
+# API 路徑
+paths:
+  /hello-world:
+    get:
+      tags:
+        - "General"
+      summary: "測試 Function"
+      description: "一個簡單的測試端點，用來確認服務是否正常運作。"
+      responses:
+        '200':
+          description: "成功回應"
+          content:
+            application/json:
+              schema:
+                type: "object"
+                properties:
+                  message:
+                    type: "string"
+                    example: "Hello World!"
+
+  /ingest-data:
+    get:
+      tags:
+        - "Data"
+      summary: "擷取 YouBike 資料"
+      description: |
+        觸發資料擷取流程。
+        1. 從 YouBike 官方 API 抓取資料。
+        2. 轉換資料並寫入 'stations' (Upsert) 和 'station_status' (Insert) 資料表。
+        3. 將執行結果寫入 'batch_logs'。
+      responses:
+        '200':
+          description: "資料擷取成功"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestSuccess"
+        '500':
+          description: "伺服器內部錯誤或擷取失敗"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/IngestFailure"
+    
+    options:
+      tags:
+        - "Data"
+      summary: "CORS Preflight"
+      description: "處理 CORS (跨來源資源共用) 的 preflight 請求。"
+      responses:
+        '200':
+          description: "OK"
+          headers:
+            Access-Control-Allow-Origin:
+              schema:
+                type: "string"
+            Access-Control-Allow-Headers:
+              schema:
+                type: "string"
+
+# 可重用的資料模型
+components:
+  schemas:
+    IngestSuccess:
+      type: "object"
+      description: "擷取成功的回應"
+      properties:
+        status:
+          type: "string"
+          example: "success"
+        inserted:
+          type: "integer"
+          description: "成功插入 'station_status' 的紀錄數量"
+          example: 1282
+    
+    IngestFailure:
+      type: "object"
+      description: "擷取失敗的回應"
+      properties:
+        status:
+          type: "string"
+          example: "failure"
+        error:
+          type: "string"
+          description: "錯誤訊息"
+          example: "Failed to fetch YouBike API: Server Error"
