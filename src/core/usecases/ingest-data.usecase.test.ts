@@ -94,6 +94,9 @@ Deno.test("IngestDataUseCase: Happy Path", async (t) => {
             status: "success",
             records_fetched: 1,
             records_inserted: 1,
+            run_started_at: "2024-05-23T10:50:20.000Z",
+            run_ended_at: "2024-05-23T10:50:21.000Z",
+            duration_ms: 1000,
         }],
     });
   });
@@ -124,6 +127,9 @@ Deno.test("IngestDataUseCase: YouBike API fetch failure", async (t) => {
         args: [{
             status: "failure",
             error_message: "API Error",
+            run_started_at: "2024-05-23T10:50:20.000Z",
+            run_ended_at: "2024-05-23T10:50:21.000Z",
+            duration_ms: 1000,
         }],
     });
   });
@@ -154,6 +160,9 @@ Deno.test("IngestDataUseCase: Database write failure", async (t) => {
         args: [{
             status: "failure",
             error_message: "DB Error",
+            run_started_at: "2024-05-23T10:50:20.000Z",
+            run_ended_at: "2024-05-23T10:50:21.000Z",
+            duration_ms: 1000,
         }],
     });
   });
@@ -184,6 +193,9 @@ Deno.test("IngestDataUseCase: YouBike API returns an empty array", async (t) => 
         args: [{
             status: "failure",
             error_message: "YouBike API returned an empty array",
+            run_started_at: "2024-05-23T10:50:20.000Z",
+            run_ended_at: "2024-05-23T10:50:21.000Z",
+            duration_ms: 1000,
         }],
     });
   });
