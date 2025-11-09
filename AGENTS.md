@@ -11,6 +11,5 @@
         *   實作 (Implementations) 應放置在 `supabase/functions/_shared/`。
     *   **新業務邏輯：** 所有新的業務邏輯都**必須**建立在 `src/core/usecases/` 中，且**只能**依賴 `src/core/interfaces/` 中的介面。
 
-感謝您的配合！
 
 「測試要求： 當您被指派新增或修改 src/core/usecases/ 中的業務邏輯時，您 必須 同時建立或更新對應的單元測試 (.test.ts) 檔案。您必須使用 Deno.test, std/assert 和 std/testing/mock.ts 來撰寫測試，並確保所有依賴都被正確模擬。」
