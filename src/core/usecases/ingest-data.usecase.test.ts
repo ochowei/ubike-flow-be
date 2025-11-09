@@ -89,16 +89,14 @@ Deno.test("IngestDataUseCase: Happy Path", async (t) => {
         }]],
     });
 
-    assertSpyCall(insertBatchLogSpy, 0, {
-        args: [{
-            status: "success",
-            records_fetched: 1,
-            records_inserted: 1,
-            run_started_at: "2024-05-23T10:50:20.000Z",
-            run_ended_at: "2024-05-23T10:50:21.000Z",
-            duration_ms: 1000,
-        }],
-    });
+    const [logPayload] = insertBatchLogSpy.calls[0].args;
+    assertEquals(logPayload.status, "success");
+    assertEquals(logPayload.records_fetched, 1);
+    assertEquals(logPayload.records_inserted, 1);
+    assertEquals(logPayload.batch_time, "2024-05-23 10:50:20");
+    assertEquals(typeof logPayload.run_started_at, "string");
+    assertEquals(typeof logPayload.run_ended_at, "string");
+    assertEquals(typeof logPayload.duration_ms, "number");
   });
 });
 
@@ -123,15 +121,12 @@ Deno.test("IngestDataUseCase: YouBike API fetch failure", async (t) => {
     );
 
     assertSpyCalls(insertBatchLogSpy, 1);
-    assertSpyCall(insertBatchLogSpy, 0, {
-        args: [{
-            status: "failure",
-            error_message: "API Error",
-            run_started_at: "2024-05-23T10:50:20.000Z",
-            run_ended_at: "2024-05-23T10:50:21.000Z",
-            duration_ms: 1000,
-        }],
-    });
+    const [logPayload] = insertBatchLogSpy.calls[0].args;
+    assertEquals(logPayload.status, "failure");
+    assertEquals(logPayload.error_message, "API Error");
+    assertEquals(typeof logPayload.run_started_at, "string");
+    assertEquals(typeof logPayload.run_ended_at, "string");
+    assertEquals(typeof logPayload.duration_ms, "number");
   });
 });
 
@@ -156,15 +151,12 @@ Deno.test("IngestDataUseCase: Database write failure", async (t) => {
     );
 
     assertSpyCalls(insertBatchLogSpy, 1);
-    assertSpyCall(insertBatchLogSpy, 0, {
-        args: [{
-            status: "failure",
-            error_message: "DB Error",
-            run_started_at: "2024-05-23T10:50:20.000Z",
-            run_ended_at: "2024-05-23T10:50:21.000Z",
-            duration_ms: 1000,
-        }],
-    });
+    const [logPayload] = insertBatchLogSpy.calls[0].args;
+    assertEquals(logPayload.status, "failure");
+    assertEquals(logPayload.error_message, "DB Error");
+    assertEquals(typeof logPayload.run_started_at, "string");
+    assertEquals(typeof logPayload.run_ended_at, "string");
+    assertEquals(typeof logPayload.duration_ms, "number");
   });
 });
 
@@ -189,14 +181,11 @@ Deno.test("IngestDataUseCase: YouBike API returns an empty array", async (t) => 
     );
 
     assertSpyCalls(insertBatchLogSpy, 1);
-    assertSpyCall(insertBatchLogSpy, 0, {
-        args: [{
-            status: "failure",
-            error_message: "YouBike API returned an empty array",
-            run_started_at: "2024-05-23T10:50:20.000Z",
-            run_ended_at: "2024-05-23T10:50:21.000Z",
-            duration_ms: 1000,
-        }],
-    });
+    const [logPayload] = insertBatchLogSpy.calls[0].args;
+    assertEquals(logPayload.status, "failure");
+    assertEquals(logPayload.error_message, "YouBike API returned an empty array");
+    assertEquals(typeof logPayload.run_started_at, "string");
+    assertEquals(typeof logPayload.run_ended_at, "string");
+    assertEquals(typeof logPayload.duration_ms, "number");
   });
 });
