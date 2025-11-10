@@ -39,6 +39,8 @@ export interface IDatabaseRepository {
   findStationsNearby(
     latitude: number,
     longitude: number,
-    distanceInMeters: number
+    distanceInMeters: number,
+    limit: number,
+    offset: number,
   ): Promise<StationPayload[]>;
 }
