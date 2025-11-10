@@ -40,6 +40,8 @@ serve(async (req) => {
     const lat = parseFloat(latStr);
     const lon = parseFloat(lonStr);
     const dist = parseInt(distStr, 10);
+    const page = parseInt(url.searchParams.get("page") ?? "1", 10);
+    const limit = parseInt(url.searchParams.get("limit") ?? "10", 10);
 
     if (isNaN(lat)) {
       return new Response(JSON.stringify({ error: "Query parameter 'lat' must be a valid number." }), {
@@ -62,13 +64,22 @@ serve(async (req) => {
 
     const db = new SupabaseRepository();
     const useCase = new FindNearbyStationsUseCase(db);
-    const stations = await useCase.execute(lat, lon, dist);
+    const stations = await useCase.execute(lat, lon, dist, page, limit);
 
     return new Response(JSON.stringify(stations), {
       headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
       status: 200,
     });
   } catch (error) {
+    if (
+      error.message.includes("Page must be a positive number.") ||
+      error.message.includes("Limit must be a positive number.")
+    ) {
+      return new Response(JSON.stringify({ error: error.message }), {
+        status: 400,
+        headers: { ...CORS_HEADERS, "Content-Type": "application/json" },
+      });
+    }
     console.error("Error processing request:", error);
     return new Response(JSON.stringify({ error: "An internal server error occurred." }), {
       headers: { ...CORS_HEADERS, "Content-Type": "application/json" },

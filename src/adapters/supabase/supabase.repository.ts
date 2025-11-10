@@ -38,12 +38,16 @@ export class SupabaseRepository implements IDatabaseRepository {
   async findStationsNearby(
     latitude: number,
     longitude: number,
-    distanceInMeters: number
+    distanceInMeters: number,
+    limit: number,
+    offset: number,
   ): Promise<StationPayload[]> {
     const { data, error } = await this.supabaseAdmin.rpc("find_stations_nearby", {
       latitude_input: latitude,
       longitude_input: longitude,
       distance_in_meters: distanceInMeters,
+      limit_input: limit,
+      offset_input: offset,
     });
 
     if (error) {

@@ -4,7 +4,6 @@ import {
 } from "https://deno.land/std@0.208.0/assert/mod.ts";
 import {
   spy,
-  stub,
 } from "https://deno.land/std@0.208.0/testing/mock.ts";
 import { FindNearbyStationsUseCase } from "./find-nearby-stations.usecase.ts";
 import { IDatabaseRepository, StationPayload } from "../types/database.types.ts";
@@ -22,6 +21,52 @@ const MOCK_STATION: StationPayload = {
   longitude: 121.5436,
 };
 
+Deno.test("FindNearbyStationsUseCase: Happy Path (With Pagination)", async (t) => {
+  const db: IDatabaseRepository = {
+    findStationsNearby: () => Promise.resolve([MOCK_STATION]),
+    upsertStations: () => Promise.resolve(),
+    insertStationStatus: () => Promise.resolve(),
+    insertBatchLog: () => Promise.resolve(),
+  };
+
+  await t.step("should call the repository with the correct limit and offset", async () => {
+    const findStationsNearbySpy = spy(db, "findStationsNearby");
+    const useCase = new FindNearbyStationsUseCase(db);
+    const result = await useCase.execute(25.0339, 121.5644, 1000, 2, 10);
+
+    assertEquals(result, [MOCK_STATION]);
+    assertEquals(findStationsNearbySpy.calls.length, 1);
+    assertEquals(findStationsNearbySpy.calls[0].args, [25.0339, 121.5644, 1000, 10, 10]);
+  });
+});
+
+Deno.test("FindNearbyStationsUseCase: Invalid Parameters (Pagination)", async (t) => {
+  const db: IDatabaseRepository = {
+    findStationsNearby: () => Promise.resolve([]),
+    upsertStations: () => Promise.resolve(),
+    insertStationStatus: () => Promise.resolve(),
+    insertBatchLog: () => Promise.resolve(),
+  };
+
+  await t.step("should throw an error for invalid page", async () => {
+    const useCase = new FindNearbyStationsUseCase(db);
+    await assertRejects(
+      () => useCase.execute(25.02605, 121.5436, 500, 0, 10),
+      Error,
+      "Page must be a positive number.",
+    );
+  });
+
+  await t.step("should throw an error for invalid limit", async () => {
+    const useCase = new FindNearbyStationsUseCase(db);
+    await assertRejects(
+      () => useCase.execute(25.02605, 121.5436, 500, 1, -1),
+      Error,
+      "Limit must be a positive number.",
+    );
+  });
+});
+
 Deno.test("FindNearbyStationsUseCase: Happy Path", async (t) => {
   const db: IDatabaseRepository = {
     findStationsNearby: () => Promise.resolve([MOCK_STATION]),
@@ -37,7 +82,7 @@ Deno.test("FindNearbyStationsUseCase: Happy Path", async (t) => {
 
     assertEquals(result, [MOCK_STATION]);
     assertEquals(findStationsNearbySpy.calls.length, 1);
-    assertEquals(findStationsNearbySpy.calls[0].args, [25.02605, 121.5436, 500]);
+    assertEquals(findStationsNearbySpy.calls[0].args, [25.02605, 121.5436, 500, 10, 0]);
   });
 });
 
