@@ -34,4 +34,21 @@ export class SupabaseRepository implements IDatabaseRepository {
       console.error(`Batch log insert error: ${error.message}`);
     }
   }
+
+  async findStationsNearby(
+    latitude: number,
+    longitude: number,
+    distanceInMeters: number
+  ): Promise<StationPayload[]> {
+    const { data, error } = await this.supabaseAdmin.rpc("find_stations_nearby", {
+      latitude_input: latitude,
+      longitude_input: longitude,
+      distance_in_meters: distanceInMeters,
+    });
+
+    if (error) {
+      throw new Error(`Find nearby stations error: ${error.message}`);
+    }
+    return data || [];
+  }
 }

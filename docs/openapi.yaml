@@ -79,9 +79,119 @@ paths:
               schema:
                 type: "string"
 
+  /find-nearby-stations:
+    get:
+      tags:
+        - "Data"
+      summary: "查詢附近站點"
+      description: "根據提供的經緯度和距離，查詢附近的 YouBike 站點。"
+      parameters:
+        - in: query
+          name: lat
+          schema:
+            type: number
+            format: float
+          required: true
+          description: "緯度"
+          example: 25.033964
+        - in: query
+          name: lon
+          schema:
+            type: number
+            format: float
+          required: true
+          description: "經度"
+          example: 121.564468
+        - in: query
+          name: dist
+          schema:
+            type: integer
+          required: true
+          description: "搜尋半徑 (單位：公尺)"
+          example: 500
+      responses:
+        '200':
+          description: "成功回傳站點陣列"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Station"
+        '400':
+          description: "參數錯誤"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+        '500':
+          description: "伺服器錯誤"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ApiError"
+    options:
+      tags:
+        - "Data"
+      summary: "CORS Preflight"
+      description: "處理 CORS (跨來源資源共用) 的 preflight 請求。"
+      responses:
+        '200':
+          description: "OK"
+
 # 可重用的資料模型
 components:
   schemas:
+    Station:
+      type: object
+      properties:
+        sno:
+          type: string
+          example: "500101001"
+        name_zh:
+          type: string
+          example: "捷運市政府站(3號出口)"
+        name_en:
+          type: string
+          example: "MRT Taipei City Hall Stataion(Exit 3)"
+        area_zh:
+          type: string
+          example: "信義區"
+        area_en:
+          type: string
+          example: "Xinyi Dist."
+        address_zh:
+          type: string
+          example: "忠孝東路/松仁路(東南側)"
+        address_en:
+          type: string
+          example: "Zhongxiao E. Rd./Songren Rd."
+        total_capacity:
+          type: integer
+          example: 40
+        latitude:
+          type: number
+          format: float
+          example: 25.0408578889
+        longitude:
+          type: number
+          format: float
+          example: 121.567904444
+        location:
+          type: object
+          description: "PostGIS location object"
+        created_at:
+          type: string
+          format: date-time
+          example: "2023-11-09T05:00:00.000Z"
+
+    ApiError:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "Query parameter 'lat' is missing."
+
     IngestSuccess:
       type: "object"
       description: "擷取成功的回應"

@@ -4,3 +4,5 @@
   [functions.hello-world]
     # Required for deploying functions
     # For more details, see https://supabase.com/docs/guides/functions/deploy
+
+  [functions.find-nearby-stations]
