@@ -43,6 +43,7 @@ Deno.test("IngestDataUseCase: Happy Path", async (t) => {
     upsertStations: () => Promise.resolve(),
     insertStationStatus: () => Promise.resolve(),
     insertBatchLog: () => Promise.resolve(),
+    findStationsNearby: () => Promise.resolve([]),
   };
 
   await t.step("should ingest data successfully", async () => {
@@ -108,6 +109,7 @@ Deno.test("IngestDataUseCase: YouBike API fetch failure", async (t) => {
     upsertStations: () => Promise.resolve(),
     insertStationStatus: () => Promise.resolve(),
     insertBatchLog: () => Promise.resolve(),
+    findStationsNearby: () => Promise.resolve([]),
   };
 
   await t.step("should handle API fetch failure", async () => {
@@ -138,6 +140,7 @@ Deno.test("IngestDataUseCase: Database write failure", async (t) => {
     upsertStations: () => Promise.reject(new Error("DB Error")),
     insertStationStatus: () => Promise.resolve(),
     insertBatchLog: () => Promise.resolve(),
+    findStationsNearby: () => Promise.resolve([]),
   };
 
   await t.step("should handle database write failure", async () => {
@@ -168,6 +171,7 @@ Deno.test("IngestDataUseCase: YouBike API returns an empty array", async (t) => 
     upsertStations: () => Promise.resolve(),
     insertStationStatus: () => Promise.resolve(),
     insertBatchLog: () => Promise.resolve(),
+    findStationsNearby: () => Promise.resolve([]),
   };
 
   await t.step("should handle empty array from YouBike API", async () => {
