@@ -38,16 +38,23 @@
 
 ## 4. 測試原則 (Testing Principles)
 
-### 單元測試 (Unit Tests)
+本專案採用「規格驅動」的測試策略，確保業務邏輯的正確性。
 
-所有在 `src/core/usecases/` 中的核心業務邏輯 (Use Cases) 必須有對應的單元測試。
+### 4.1. 行為規格 (Behavioral Specifications) - (What to test)
 
-測試檔案應與被測試的檔案放在同一目錄下，並以 `.test.ts` 結尾 (例如 `ingest-data.usecase.test.ts`)。
+* **真相來源 (Source of Truth):** `features/` 目錄下的 `.feature` 檔案是所有業務邏輯的「黃金規格」。
+* **格式:** 使用 Gherkin 語法 (Given/When/Then) 描述使用者情境與系統行為。
+* **目的:** 這些檔案是開發 (包含 AI Agent) 的主要依據，用於指導 Use Case 的實作與單元測試的撰寫。
 
-單元測試必須模擬 (Mock) 所有外部依賴（例如 `IDatabaseRepository`, `IYouBikeService`），僅專注於測試 Use Case 本身的邏輯。
+### 4.2. 單元測試 (Unit Tests) - (How to test)
 
-### 測試框架 (Testing Stack)
+所有在 `src/core/usecases/` 中的核心業務邏輯 (Use Cases) 必須有對應的單元測試，以**驗證 `features/` 檔案中描述的行為**。
 
-*   **測試運行器 (Runner):** `Deno.test` (Deno 內建)
-*   **斷言 (Assertions):** `deno.land/std/assert` (Deno 標準庫)
-*   **模擬 (Mocks):** `deno.land/std/testing/mock.ts` (Deno 標準庫)
+* **檔案位置:** 測試檔案應與被測試的檔案放在同一目錄下，並以 `.test.ts` 結尾 (例如 `ingest-data.usecase.test.ts`)。
+* **職責:** 單元測試必須模擬 (Mock) 所有外部依賴（例如 `IDatabaseRepository`, `IYouBikeService`），僅專注於測試 Use Case 本身的邏輯是否符合 `.feature` 規格。
+
+### 4.3. 測試框架 (Testing Stack)
+
+* **測試運行器 (Runner):** `Deno.test` (Deno 內建)
+* **斷言 (Assertions):** `deno.land/std/assert` (Deno 標準庫)
+* **模擬 (Mocks):** `deno.land/std/testing/mock.ts` (Deno 標準庫)
