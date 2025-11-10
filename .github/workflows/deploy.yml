@@ -51,12 +51,6 @@ jobs:
         with:
           version: latest
 
-      # 5. 推送資料庫遷移
-      - name: Push Database Migrations
-        env:
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: supabase db push
-
-      # 6. 部署 Edge Functions
+      # 5. 部署 Edge Functions
       - name: Deploy Supabase Functions
         run: supabase functions deploy
