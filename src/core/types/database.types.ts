@@ -36,4 +36,9 @@ export interface IDatabaseRepository {
   upsertStations(stations: StationPayload[]): Promise<void>;
   insertStationStatus(statuses: StatusPayload[]): Promise<void>;
   insertBatchLog(log: LogPayload): Promise<void>;
+  findStationsNearby(
+    latitude: number,
+    longitude: number,
+    distanceInMeters: number
+  ): Promise<StationPayload[]>;
 }
